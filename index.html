@@ -23,79 +23,82 @@
             top: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(135deg, #1a0000 0%, #330000 50%, #1a0000 100%);
-            box-shadow: 0 4px 20px rgba(255, 0, 0, 0.3);
+            background: #000000;
+            border-bottom: 1px solid #333;
             z-index: 1000;
+            padding: 15px 0;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .brand-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        h1 {
+            font-size: 1.5em;
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 0;
         }
 
         nav {
             display: flex;
-            gap: 40px;
-            justify-content: center;
-            padding: 20px 40px;
-            background: rgba(0, 0, 0, 0.5);
+            gap: 30px;
+            padding: 0;
+            background: transparent;
         }
 
         .nav-btn {
             background: transparent;
-            color: #fff;
+            color: #ccc;
             border: none;
             padding: 0;
-            font-size: 1.1em;
+            font-size: 1em;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: 600;
-            letter-spacing: 2px;
+            font-weight: 500;
+            letter-spacing: 0;
             position: relative;
         }
 
         .nav-btn::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: #ff0000;
-            transition: width 0.3s ease;
-        }
-
-        .nav-btn:hover::after {
-            width: 100%;
+            display: none;
         }
 
         .nav-btn:hover {
-            color: #ff0000;
+            color: #fff;
         }
 
         .nav-btn.active {
-            color: #ff0000;
-        }
-
-        .nav-btn.active::after {
-            width: 100%;
-        }
-
-        .brand-bar {
-            background: linear-gradient(135deg, #000000 0%, #1a0000 100%);
-            padding: 30px 40px;
-            text-align: center;
-            border-top: 1px solid rgba(255, 0, 0, 0.3);
-        }
-
-        h1 {
-            font-size: 3em;
-            background: linear-gradient(135deg, #ff0000, #ff6666);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 700;
-            letter-spacing: 4px;
+            color: #fff;
         }
 
         .main-content {
-            margin-top: 180px;
-            min-height: calc(100vh - 180px);
+            margin-top: 70px;
+            min-height: calc(100vh - 70px);
         }
 
         .page {
@@ -223,10 +226,27 @@
 
         .games-container h2 {
             font-size: 3em;
-            margin-bottom: 60px;
+            margin-bottom: 20px;
             color: #fff;
             text-align: left;
             font-weight: 700;
+        }
+
+        .total-stats {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+
+        .total-stat-item {
+            color: #999;
+        }
+
+        .total-stat-item span {
+            color: #fff;
+            font-weight: 700;
+            margin-left: 10px;
         }
 
         .games-grid {
@@ -374,13 +394,18 @@
 </head>
 <body>
     <header>
-        <nav>
-            <button class="nav-btn active" onclick="showPage('home')">HOME</button>
-            <button class="nav-btn" onclick="showPage('games')">OUR GAMES</button>
-            <button class="nav-btn" onclick="showPage('team')">MEET THE TEAM</button>
-        </nav>
-        <div class="brand-bar">
-            <h1>TRUEPART</h1>
+        <div class="header-content">
+            <div class="brand-section">
+                <div class="brand-icon">
+                    <img src="https://media.discordapp.net/attachments/1437375441999761534/1451956242540138576/Gemini_Generated_Image_eud3uzeud3uzeud3_1_1.png?ex=6963bea0&is=69626d20&hm=976906bc241c91fd774606cc1bf2a9e0de326cec94898001b64f2f63cacfdb8c&=&format=webp&quality=lossless&width=1780&height=1780" alt="TruePart">
+                </div>
+                <h1>TruePart</h1>
+            </div>
+            <nav>
+                <button class="nav-btn active" onclick="showPage('home')">Home</button>
+                <button class="nav-btn" onclick="showPage('games')">Our Games</button>
+                <button class="nav-btn" onclick="showPage('team')">Meet the Team</button>
+            </nav>
         </div>
     </header>
 
@@ -413,6 +438,10 @@
         <div id="games" class="page">
             <div class="games-container">
                 <h2>Our Games</h2>
+                <div class="total-stats">
+                    <div class="total-stat-item">Total CCU: <span id="totalCCU">-</span></div>
+                    <div class="total-stat-item">Total Visits: <span id="totalVisits">-</span></div>
+                </div>
                 <div id="gamesList" class="games-grid">
                     <div class="loading">Loading games...</div>
                 </div>
@@ -500,6 +529,19 @@
                     gamesList.innerHTML = '<p class="loading">Could not find games. Please check your Place IDs.</p>';
                     return;
                 }
+                
+                // Calculate totals
+                let totalCCU = 0;
+                let totalVisits = 0;
+                
+                for (const game of result.data) {
+                    totalCCU += game.playing || 0;
+                    totalVisits += game.visits || 0;
+                }
+                
+                // Update total stats
+                document.getElementById('totalCCU').textContent = formatNumber(totalCCU);
+                document.getElementById('totalVisits').textContent = formatNumber(totalVisits);
                 
                 let gamesHTML = '';
                 
