@@ -29,6 +29,36 @@
             padding: 15px 0;
         }
 
+        .stats-bar {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+            z-index: 999;
+            padding: 12px 0;
+        }
+
+        .stats-bar-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            gap: 40px;
+            font-size: 1em;
+        }
+
+        .stats-bar-item {
+            color: #999;
+        }
+
+        .stats-bar-item span {
+            color: #fff;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+
         .header-content {
             max-width: 1600px;
             margin: 0 auto;
@@ -97,8 +127,8 @@
         }
 
         .main-content {
-            margin-top: 70px;
-            min-height: calc(100vh - 70px);
+            margin-top: 120px;
+            min-height: calc(100vh - 120px);
         }
 
         .page {
@@ -226,27 +256,14 @@
 
         .games-container h2 {
             font-size: 3em;
-            margin-bottom: 20px;
+            margin-bottom: 60px;
             color: #fff;
             text-align: left;
             font-weight: 700;
         }
 
         .total-stats {
-            display: flex;
-            gap: 40px;
-            margin-bottom: 40px;
-            font-size: 1.2em;
-        }
-
-        .total-stat-item {
-            color: #999;
-        }
-
-        .total-stat-item span {
-            color: #fff;
-            font-weight: 700;
-            margin-left: 10px;
+            display: none;
         }
 
         .games-grid {
@@ -261,6 +278,9 @@
             overflow: hidden;
             transition: all 0.3s ease;
             cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
         }
 
         .game-card:hover {
@@ -340,19 +360,23 @@
 
         .team-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 40px;
+            max-width: 900px;
+            margin: 0 auto;
         }
 
         .team-card {
             background: linear-gradient(135deg, #1a0000, #0a0a0a);
             border: 2px solid #ff0000;
-            padding: 50px 30px;
-            text-align: center;
+            padding: 40px;
             box-shadow: 0 10px 40px rgba(255, 0, 0, 0.2);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 30px;
         }
 
         .team-card::before {
@@ -376,17 +400,30 @@
             box-shadow: 0 20px 60px rgba(255, 0, 0, 0.4);
         }
 
-        .team-card h3 {
-            font-size: 2em;
-            margin-bottom: 15px;
-            color: #ff0000;
+        .team-info {
+            flex: 1;
             position: relative;
             z-index: 1;
         }
 
-        .team-card p {
-            font-size: 1.2em;
+        .team-card h3 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #ff0000;
+        }
+
+        .team-card .role {
+            font-size: 1.1em;
             color: #ccc;
+            margin-bottom: 5px;
+        }
+
+        .team-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #ff0000;
+            object-fit: cover;
             position: relative;
             z-index: 1;
         }
@@ -404,10 +441,17 @@
             <nav>
                 <button class="nav-btn active" onclick="showPage('home')">Home</button>
                 <button class="nav-btn" onclick="showPage('games')">Our Games</button>
-                <button class="nav-btn" onclick="showPage('team')">Meet the Team</button>
+                <button class="nav-btn" onclick="showPage('team')">Meet Us</button>
             </nav>
         </div>
     </header>
+
+    <div class="stats-bar">
+        <div class="stats-bar-content">
+            <div class="stats-bar-item">Total CCU: <span id="globalTotalCCU">-</span></div>
+            <div class="stats-bar-item">Total Visits: <span id="globalTotalVisits">-</span></div>
+        </div>
+    </div>
 
     <div class="main-content">
         <div id="home" class="page active">
@@ -450,19 +494,21 @@
 
         <div id="team" class="page">
             <div class="team-container">
-                <h2>MEET THE TEAM</h2>
+                <h2>MEET US</h2>
                 <div class="team-grid">
                     <div class="team-card">
-                        <h3>TotallySpaghetti</h3>
-                        <p>Developer & Creator</p>
+                        <div class="team-info">
+                            <h3>TotallySpaghetti</h3>
+                            <div class="role">Founder</div>
+                            <div class="role">Lead Programmer</div>
+                        </div>
+                        <img class="team-avatar" src="https://cdn.discordapp.com/attachments/1326690286166560808/1333254638681362442/image.png?ex=696331e4&is=6961e064&hm=eef9e44607ce5de64c851c3acb2450eadcdaa7f3c7bc064b479a0d71e46c1ddd&" alt="TotallySpaghetti">
                     </div>
                     <div class="team-card">
-                        <h3>Bchanbuilds</h3>
-                        <p>Developer & Creator</p>
-                    </div>
-                    <div class="team-card">
-                        <h3>Oppy</h3>
-                        <p>Developer & Creator</p>
+                        <div class="team-info">
+                            <h3>Oppy</h3>
+                            <div class="role">Lead Artist</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -474,6 +520,8 @@
         // Put your game PLACE IDs here (the number from the game URL)
         const GAME_PLACE_IDS = [
             89226104209047,
+            125607488836191,
+            9510198137,
         ];
         // ===== END CONFIGURATION =====
 
@@ -539,15 +587,15 @@
                     totalVisits += game.visits || 0;
                 }
                 
-                // Update total stats
-                document.getElementById('totalCCU').textContent = formatNumber(totalCCU);
-                document.getElementById('totalVisits').textContent = formatNumber(totalVisits);
+                // Update global stats bar
+                document.getElementById('globalTotalCCU').textContent = formatNumber(totalCCU);
+                document.getElementById('globalTotalVisits').textContent = formatNumber(totalVisits);
                 
                 let gamesHTML = '';
                 
                 for (const game of result.data) {
                     gamesHTML += `
-                        <div class="game-card">
+                        <a href="https://www.roblox.com/games/${game.rootPlaceId}" target="_blank" class="game-card">
                             <div class="game-thumbnail-container">
                                 <img class="game-thumbnail-img" src="${game.thumbnail || 'https://via.placeholder.com/300x300/ff0000/ffffff?text=No+Image'}" alt="${game.name}">
                             </div>
@@ -564,7 +612,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     `;
                 }
                 
@@ -574,6 +622,11 @@
                 console.error('Full error:', error);
             }
         }
+
+        // Load games on page load to populate stats bar
+        window.addEventListener('load', () => {
+            loadGames();
+        });
 
         function formatNumber(num) {
             if (num >= 1000000000) {
