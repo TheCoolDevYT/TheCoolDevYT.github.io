@@ -37,7 +37,7 @@
             background: #1a1a1a;
             border-bottom: 1px solid #333;
             z-index: 999;
-            padding: 12px 0;
+            padding: 15px 0;
         }
 
         .stats-bar-content {
@@ -45,19 +45,22 @@
             margin: 0 auto;
             padding: 0 40px;
             display: flex;
-            gap: 40px;
-            font-size: 1em;
+            gap: 50px;
+            font-size: 1.1em;
             justify-content: center;
+            align-items: center;
         }
 
         .stats-bar-item {
             color: #999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .stats-bar-item span {
             color: #fff;
             font-weight: 700;
-            margin-left: 10px;
         }
 
         .header-content {
@@ -561,6 +564,13 @@
                 return;
             }
 
+            // Check if we have cached data that's less than 60 seconds old
+            const now = Date.now();
+            if (window.gamesCache && window.gamesCacheTime && (now - window.gamesCacheTime) < 60000) {
+                displayGames(window.gamesCache);
+                return;
+            }
+
             gamesList.innerHTML = '<div class="loading">Loading games...</div>';
             
             try {
@@ -580,49 +590,152 @@
                     return;
                 }
                 
-                // Calculate totals
-                let totalCCU = 0;
-                let totalVisits = 0;
+                // Cache the result with timestamp
+                window.gamesCache = result;
+                window.gamesCacheTime = Date.now();
+                displayGames(result);
                 
-                for (const game of result.data) {
-                    totalCCU += game.playing || 0;
-                    totalVisits += game.visits || 0;
-                }
-                
-                // Update global stats bar
-                document.getElementById('globalTotalCCU').textContent = formatNumber(totalCCU);
-                document.getElementById('globalTotalVisits').textContent = formatNumber(totalVisits);
-                
-                let gamesHTML = '';
-                
-                for (const game of result.data) {
-                    gamesHTML += `
-                        <a href="https://www.roblox.com/games/${game.rootPlaceId}" target="_blank" class="game-card">
-                            <div class="game-thumbnail-container">
-                                <img class="game-thumbnail-img" src="${game.thumbnail || 'https://via.placeholder.com/300x300/ff0000/ffffff?text=No+Image'}" alt="${game.name}">
-                            </div>
-                            <div class="game-info">
-                                <div class="game-title">${game.name}</div>
-                                <div class="game-stats-container">
-                                    <div class="stat-item">
-                                        <div class="stat-label">Visits</div>
-                                        <div class="stat-value">${formatNumber(game.visits || 0)}</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">Playing</div>
-                                        <div class="stat-value">${formatNumber(game.playing || 0)}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    `;
-                }
-                
-                gamesList.innerHTML = gamesHTML || '<p class="loading">No games found.</p>';
             } catch (error) {
                 gamesList.innerHTML = `<p class="loading">Error loading games: ${error.message}</p>`;
                 console.error('Full error:', error);
             }
+        }
+
+        function displayGames(result) {
+            const gamesList = document.getElementById('gamesList');
+            
+            // Calculate totals
+            let totalCCU = 0;
+            let totalVisits = 0;
+            
+            for (const game of result.data) {
+                totalCCU += game.playing || 0;
+                totalVisits += game.visits || 0;
+            }
+            
+            // Update global stats bar
+            document.getElementById('globalTotalCCU').textContent = formatNumber(totalCCU);
+            document.getElementById('globalTotalVisits').textContent = formatNumber(totalVisits);
+            
+            let gamesHTML = '';
+            
+            for (const game of result.data) {
+                gamesHTML += `
+                    <a href="https://www.roblox.com/games/${game.rootPlaceId}" target="_blank" class="game-card">
+                        <div class="game-thumbnail-container">
+                            <img class="game-thumbnail-img" src="${game.thumbnail || 'https://via.placeholder.com/300x300/ff0000/ffffff?text=No+Image'}" alt="${game.name}">
+                        </div>
+                        <div class="game-info">
+                            <div class="game-title">${game.name}</div>
+                            <div class="game-stats-container">
+                                <div class="stat-item">
+                                    <div class="stat-label">Visits</div>
+                                    <div class="stat-value">${formatNumber(game.visits || 0)}</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Playing</div>
+                                    <div class="stat-value">${formatNumber(game.playing || 0)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                `;
+            }
+            
+            gamesList.innerHTML = gamesHTML || '<p class="loading">No games found.</p>';
+        }
+
+        // Load games on page load to populate stats bar
+        let lastLoadTime = 0;
+        const CACHE_DURATION = 60000; // 60 seconds in milliseconds
+
+        async function loadGames() {
+            const gamesList = document.getElementById('gamesList');
+            const now = Date.now();
+            
+            if (GAME_PLACE_IDS.length === 0) {
+                gamesList.innerHTML = '<p class="loading">No games configured yet. Add your game place IDs to the GAME_PLACE_IDS array in the code.</p>';
+                return;
+            }
+
+            // Check if we have cached data and if it's still fresh (within 60 seconds)
+            if (window.gamesCache && window.gamesCacheTime && (Date.now() - window.gamesCacheTime < 60000)) {
+                displayGames(window.gamesCache);
+                return;
+            }
+
+            gamesList.innerHTML = '<div class="loading">Loading games...</div>';
+            
+            try {
+                // Direct URL with place IDs
+                const url = `https://calm-waterfall-82e9.caestudios33.workers.dev/?placeIds=${GAME_PLACE_IDS.join(',')}`;
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                if (!result || !result.data || result.data.length === 0) {
+                    gamesList.innerHTML = '<p class="loading">Could not find games. Please check your Place IDs.</p>';
+                    return;
+                }
+                
+                // Cache the result with timestamp
+                window.gamesCache = result;
+                window.gamesCacheTime = Date.now();
+                displayGames(result);
+                
+            } catch (error) {
+                gamesList.innerHTML = `<p class="loading">Error loading games: ${error.message}</p>`;
+                console.error('Full error:', error);
+            }
+        }
+
+        function displayGames(result) {
+            const gamesList = document.getElementById('gamesList');
+            
+            // Calculate totals
+            let totalCCU = 0;
+            let totalVisits = 0;
+            
+            for (const game of result.data) {
+                totalCCU += game.playing || 0;
+                totalVisits += game.visits || 0;
+            }
+            
+            // Update global stats bar
+            document.getElementById('globalTotalCCU').textContent = formatNumber(totalCCU);
+            document.getElementById('globalTotalVisits').textContent = formatNumber(totalVisits);
+            
+            let gamesHTML = '';
+            
+            for (const game of result.data) {
+                gamesHTML += `
+                    <a href="https://www.roblox.com/games/${game.rootPlaceId}" target="_blank" class="game-card">
+                        <div class="game-thumbnail-container">
+                            <img class="game-thumbnail-img" src="${game.thumbnail || 'https://via.placeholder.com/300x300/ff0000/ffffff?text=No+Image'}" alt="${game.name}">
+                        </div>
+                        <div class="game-info">
+                            <div class="game-title">${game.name}</div>
+                            <div class="game-stats-container">
+                                <div class="stat-item">
+                                    <div class="stat-label">Visits</div>
+                                    <div class="stat-value">${formatNumber(game.visits || 0)}</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Playing</div>
+                                    <div class="stat-value">${formatNumber(game.playing || 0)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                `;
+            }
+            
+            gamesList.innerHTML = gamesHTML || '<p class="loading">No games found.</p>';
         }
 
         // Load games on page load to populate stats bar
