@@ -51,6 +51,15 @@
             align-items: center;
         }
 
+        @media (max-width: 768px) {
+            .stats-bar-content {
+                flex-direction: column;
+                gap: 10px;
+                font-size: 1em;
+                padding: 10px 20px 0 20px;
+            }
+        }
+
         .stats-bar-item {
             color: #ccc;
             display: flex;
@@ -59,10 +68,22 @@
             font-weight: 500;
         }
 
+        @media (max-width: 768px) {
+            .stats-bar-item {
+                gap: 8px;
+            }
+        }
+
         .stats-bar-item span {
             color: #ff0000;
             font-weight: 700;
             font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .stats-bar-item span {
+                font-size: 1.1em;
+            }
         }
 
         .header-content {
@@ -101,11 +122,23 @@
             letter-spacing: 0;
         }
 
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.2em;
+            }
+        }
+
         nav {
             display: flex;
             gap: 30px;
             padding: 0;
             background: transparent;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                gap: 15px;
+            }
         }
 
         .nav-btn {
@@ -119,6 +152,12 @@
             font-weight: 500;
             letter-spacing: 0;
             position: relative;
+        }
+
+        @media (max-width: 768px) {
+            .nav-btn {
+                font-size: 0.9em;
+            }
         }
 
         .nav-btn::after {
@@ -261,12 +300,25 @@
             min-height: 100vh;
         }
 
+        @media (max-width: 768px) {
+            .games-container {
+                padding: 40px 20px;
+            }
+        }
+
         .games-container h2 {
             font-size: 3em;
             margin-bottom: 60px;
             color: #fff;
             text-align: left;
             font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            .games-container h2 {
+                font-size: 2em;
+                margin-bottom: 30px;
+            }
         }
 
         .total-stats {
@@ -277,6 +329,13 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .games-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
         }
 
         .game-card {
@@ -316,6 +375,12 @@
             font-weight: 700;
             margin-bottom: 15px;
             color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 1.1em;
+            }
         }
 
         .game-stats-container {
@@ -503,14 +568,13 @@
             <div class="team-container">
                 <h2>MEET US</h2>
                 <div class="team-grid">
-                    <div class="team-card">
+                    <a href="https://x.com/spaghetti341532" target="_blank" class="team-card" style="text-decoration: none; color: inherit;">
                         <div class="team-info">
                             <h3>TotallySpaghetti</h3>
                             <div class="role">Founder</div>
                             <div class="role">Lead Programmer</div>
                         </div>
-                        <img class="team-avatar" src="https://cdn.discordapp.com/attachments/1326690286166560808/1333254638681362442/image.png?ex=696331e4&is=6961e064&hm=eef9e44607ce5de64c851c3acb2450eadcdaa7f3c7bc064b479a0d71e46c1ddd&" alt="TotallySpaghetti">
-                    </div>
+                    </a>
                     <div class="team-card">
                         <div class="team-info">
                             <h3>Oppy</h3>
@@ -535,7 +599,7 @@
             17516596118,
             118614517739521,
             105140101311780,
-            110931811137535
+            110931811137535,
         ];
         // ===== END CONFIGURATION =====
 
