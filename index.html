@@ -646,12 +646,10 @@
         }
 
         // Load games on page load to populate stats bar
-        let lastLoadTime = 0;
-        const CACHE_DURATION = 60000; // 60 seconds in milliseconds
+        let retryTimeout = null;
 
         async function loadGames() {
             const gamesList = document.getElementById('gamesList');
-            const now = Date.now();
             
             if (GAME_PLACE_IDS.length === 0) {
                 gamesList.innerHTML = '<p class="loading">No games configured yet. Add your game place IDs to the GAME_PLACE_IDS array in the code.</p>';
@@ -679,18 +677,32 @@
                 const result = await response.json();
                 
                 if (!result || !result.data || result.data.length === 0) {
-                    gamesList.innerHTML = '<p class="loading">Could not find games. Please check your Place IDs.</p>';
-                    return;
+                    throw new Error('No game data received');
                 }
                 
                 // Cache the result with timestamp
                 window.gamesCache = result;
                 window.gamesCacheTime = Date.now();
+                
+                // Clear any existing retry timeout
+                if (retryTimeout) {
+                    clearTimeout(retryTimeout);
+                    retryTimeout = null;
+                }
+                
                 displayGames(result);
                 
             } catch (error) {
-                gamesList.innerHTML = `<p class="loading">Error loading games: ${error.message}</p>`;
-                console.error('Full error:', error);
+                console.error('Error loading games:', error);
+                gamesList.innerHTML = '<div class="loading">Loading games...</div>';
+                
+                // Retry after 5 seconds
+                if (retryTimeout) {
+                    clearTimeout(retryTimeout);
+                }
+                retryTimeout = setTimeout(() => {
+                    loadGames();
+                }, 5000);
             }
         }
 
